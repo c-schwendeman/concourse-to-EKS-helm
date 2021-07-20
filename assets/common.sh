@@ -34,7 +34,8 @@ generate_awscli_kubeconfig() {
   echo "##############################################################################################################"
   local aws_eks_cluster_name
   aws_eks_cluster_name="$(jq -r '.source.aws_eks_cluster_name // ""' < "$payload")"
-  aws eks update-kubeconfig --name $aws_eks_cluster_name
+  aws_cross_account_role_arn="$(jq -r '.source.aws_cross_account_role_arn // ""' < "$payload")"
+  aws eks update-kubeconfig --name $aws_eks_cluster_name --role-arn $aws_cross_account_role_arn
 }
 
 
