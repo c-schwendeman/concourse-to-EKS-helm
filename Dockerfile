@@ -1,5 +1,5 @@
 FROM alpine:3.10 as build
-LABEL maintainer="Konkerlabs, Andre Rocha <andre@konkerlabs.com>"
+LABEL maintainer="Chris Schwendeman. Adapted from the Konkerlabs image written by Andre Rocha"
 
 RUN apk add --update --no-cache ca-certificates git
 

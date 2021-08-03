@@ -1,9 +1,9 @@
 # Helm3 for EKS Resource for Concourse
 
-Deploy to [Kubernetes Helm](https://github.com/kubernetes/helm) from [Concourse](https://concourse.ci/) using aws authenticator to support EKS clusters
+Deploy to [AWS EKS](https://aws.amazon.com/eks/) from [Concourse](https://concourse.ci/) using an aws role
 
-Forked and inspired by from linkyard/concourse-helm-resource.  
-Modified to support AWS authentication informing an account ( id and secret ) that has access to EKS cluster
+Forked and inspired by from KonkerLabs/concourse-eks-helm3-resource.  
+Modified to enable cross account deployments via an assumed role that has access to EKS cluster.
 
 ## Installing
 
@@ -11,20 +11,22 @@ Add the resource type to your pipeline:
 
 ```yaml
 resource_types:
-- name: helm
+- name: helm-eks-resource-type
   source:
-    repository: konkerlabs/concourse-eks-helm3-resource
+    repository: cschwendeman/concourse-to-eks-helm
     tag: latest
   type: docker-image
 resources:
 - name: helm-eks-release
   source:
     aws_eks_cluster_name: EKS_NAME
+    aws_cross_account_role_arn: DESTINATION_ACCOUNT_AWS_ROLE_ARN
     aws_region: EKS REGION
-    aws_access_key_id: YOUR_AWS_ACCESS_KEY_ID
-    aws_secret_access_key: YOUR_AWS_SECRET_ACCESS_KEY
+    aws_access_key_id: SOURCE_AWS_ACCESS_KEY_ID
+    aws_secret_access_key: SOURCE_AWS_SECRET_ACCESS_KEY
     namespace: NAMESPACE_TO_DEPLOY
     release: HELM_RELEASE_NAME
+  type: helm-eks-resource-type
   
 ```
 
@@ -37,9 +39,9 @@ resources:
 #### Source Configuration - AWS EKS options
 * `aws_region`:  the eks cluster region
 * `aws_eks_cluster_name`:  the AWS EKS cluster name
-* `aws_access_key_id`:  the AWS access key id ( this account require access to your eks cluster )
-* `aws_secret_access_key`:  the AWS secret access key ( this account require access to your eks cluster )
-
+* `aws_access_key_id`:  the AWS access key id ( of the source account )
+* `aws_secret_access_key`:  the AWS secret access key ( of the source account )
+* `aws_cross_account_role_arn`: the arn of the role to assume ( in the destination account )
 
 ## Behavior
 
@@ -87,12 +89,13 @@ on the cluster.
 
 ### Out
 
-Define type
+Define type:
+
 ```yaml
 resource_types:
-- name: helm
+- name: helm-eks-resource-type
   source:
-    repository: konkerlabs/concourse-eks-helm3-resource
+    repository: cschwendeman/concourse-to-eks-helm
     tag: latest
   type: docker-image
 ```
@@ -105,10 +108,12 @@ resources:
   source:
     aws_eks_cluster_name: EKS_NAME
     aws_region: EKS REGION
-    aws_access_key_id: YOUR_AWS_ACCESS_KEY_ID
-    aws_secret_access_key: YOUR_AWS_SECRET_ACCESS_KEY
+    aws_cross_account_role_arn: DESTINATION_ACCOUNT_AWS_ROLE_ARN
+    aws_access_key_id: SOURCE_AWS_ACCESS_KEY_ID
+    aws_secret_access_key: SOURCE_AWS_SECRET_ACCESS_KEY
     namespace: NAMESPACE_TO_DEPLOY
     release: HELM_RELEASE_NAME
+  type: helm-eks-resource-type
 ```
 
 Add to job:

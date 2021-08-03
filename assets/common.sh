@@ -24,18 +24,20 @@ generate_awscli_kubeconfig() {
   export AWS_SECRET_ACCESS_KEY=$aws_secret_access_key 
   export AWS_DEFAULT_REGION=$aws_region
   export AWS_REGION=$aws_region
-  echo "##############################################################################################################"
-  echo "##############################################################################################################"
-  echo "##################################### using creds ############################################################"
-  echo "# AWS_DEFAULT_REGION = "$AWS_DEFAULT_REGION
-  echo "# AWS_REGION = "$AWS_REGION
-  echo "##############################################################################################################"
-  echo "##############################################################################################################"
-  echo "##############################################################################################################"
+
   local aws_eks_cluster_name
+  local aws_cross_account_role_arn
   aws_eks_cluster_name="$(jq -r '.source.aws_eks_cluster_name // ""' < "$payload")"
   aws_cross_account_role_arn="$(jq -r '.source.aws_cross_account_role_arn // ""' < "$payload")"
-  aws eks update-kubeconfig --name $aws_eks_cluster_name --role-arn $aws_cross_account_role_arn
+  
+  ROLE=$(aws sts assume-role --role-arn "$aws_cross_account_role_arn" --role-session-name "Concourse-eks-access")
+  echo "Assumed role $aws_cross_account_role_arn"
+  AWS_ACCESS_KEY_ID=$(echo ${ROLE} | jq -r '.Credentials.AccessKeyId')
+  AWS_SECRET_ACCESS_KEY=$(echo ${ROLE} | jq -r '.Credentials.SecretAccessKey')
+  export AWS_SESSION_TOKEN=$(echo ${ROLE} | jq -r '.Credentials.SessionToken')
+
+  aws eks update-kubeconfig --name $aws_eks_cluster_name 
+  
 }
 
 
