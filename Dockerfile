@@ -3,9 +3,9 @@ LABEL maintainer="Chris Schwendeman. Adapted from the Konkerlabs image written b
 
 RUN apk add --update --no-cache ca-certificates git
 
-ENV VERSION=v3.0.0
+ENV VERSION=v3.7.0
 ENV FILENAME=helm-${VERSION}-linux-amd64.tar.gz
-ENV SHA256SUM=10e1fdcca263062b1d7b2cb93a924be1ef3dd6c381263d8151dd1a20a3d8c0dc
+ENV SHA256SUM=096e30f54c3ccdabe30a8093f8e128dba76bb67af697b85db6ed0453a2701bf9
 
 WORKDIR /
 

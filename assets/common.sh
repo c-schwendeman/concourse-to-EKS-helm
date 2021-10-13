@@ -66,5 +66,5 @@ wait_for_service_up() {
 setup_resource() {
   echo "Initializing kubectl..."
   setup_kubernetes $1 $2
-  echo "setup done"
+  echo "Setup done"
 }
